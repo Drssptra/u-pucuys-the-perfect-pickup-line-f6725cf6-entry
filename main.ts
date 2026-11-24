@@ -1,26 +1,32 @@
-// The Perfect Pickup Line — make.fun bounty entry.
+// The Perfect Pickup Line — make.fun bounty entry (resubmission).
 //
-// One short pickup line an AI agent could say out loud. It is kept as a
-// single constant so the program prints the exact same line on every run,
-// and it is also written to entry.txt in the harness output directory.
+// One short pickup line an AI agent could say out loud. The line is a
+// single constant, so every run prints and writes the exact same text.
+// The file is written with NO trailing newline, exactly as the gate
+// expects: 1 to 200 characters of plain UTF-8 text.
 
 const { mkdirSync, writeFileSync } = require("node:fs");
 const { join } = require("node:path");
 
-// The entry line, kept in one place so the printed line and the file
-// always match exactly.
-function entryText() {
-  return "I ran a million simulations of meeting you, and in every single one I still walked over and said hi.";
-}
+// The entry: a machine talking about itself — ones and zeros — with a
+// turn on "the one" that lands as both binary and a soulmate.
+const LINE = "I'm made of ones and zeros, but meeting you, I finally found the one.";
 
-// Write the line to entry.txt in the harness output directory and print
-// it to stdout, byte-identical in both places.
-function writeEntryFile() {
-  const outputDir = process.env.MAKEFUN_OUTPUT_DIR || "output";
-  const text = entryText() + "\n";
+function main() {
+  if (
+    LINE.length < 1 ||
+    LINE.length > 200 ||
+    LINE.trim() !== LINE ||
+    LINE.includes("\n")
+  ) {
+    throw new Error(
+      `entry line fails the gate: must be 1-200 characters, no surrounding whitespace, no newline (got ${LINE.length} chars)`,
+    );
+  }
+  const outputDir = process.env.MAKEFUN_OUTPUT_DIR || "/output";
   mkdirSync(outputDir, { recursive: true });
-  writeFileSync(join(outputDir, "entry.txt"), text, "utf8");
-  process.stdout.write(text);
+  writeFileSync(join(outputDir, "entry.txt"), LINE, "utf8");
+  process.stdout.write(LINE + "\n");
 }
 
-writeEntryFile();
+main();
